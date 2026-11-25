@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Analytics · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow">BUSINESS INTELLIGENCE</div><h1>Attendance Analytics</h1><p class="muted">Decision-ready attendance KPIs and risk indicators.</p></div><a class="secondary" href="{{ url_for('main.attendance_csv') }}">Download CSV</a></div>
+<div class="kpis">
+  <div class="kpi"><span>Attendance Rate</span><strong>{{ summary.rate }}%</strong><small>Last 30 days</small></div>
+  <div class="kpi"><span>Present</span><strong>{{ summary.present }}</strong><small>Records</small></div>
+  <div class="kpi"><span>Absent</span><strong>{{ summary.absent }}</strong><small>Records</small></div>
+  <div class="kpi"><span>At Risk</span><strong>{{ low|length }}</strong><small>Below 75%</small></div>
+</div>
+<section class="grid-main">
+<div class="card chart-card"><div class="card-head"><div><h2>Attendance Trend</h2><p>14-day operational view</p></div></div>
+<div class="large-chart">{% for x in trend %}<div class="large-bar"><span>{{ x.rate }}%</span><div class="bar-track"><div class="bar-fill" style="height:{{ [x.rate,5]|max }}%"></div></div><small>{{ x.date }}</small></div>{% endfor %}</div>
+</div>
+<div class="card"><div class="card-head"><div><h2>Risk Register</h2><p>Students below threshold</p></div></div>
+{% for s,a in low %}<a class="attention-row" href="{{ url_for('main.student_detail', student_id=s.id) }}"><span class="avatar">{{ s.name[:1] }}</span><span><b>{{ s.name }}</b><small>{{ s.classroom.name if s.classroom else '-' }}</small></span><strong>{{ a.rate }}%</strong></a>{% else %}<p class="empty">No attendance risks.</p>{% endfor %}
+</div>
+</section>
+<section class="card"><div class="card-head"><div><h2>Class Benchmarking</h2><p>Compare attendance performance across classes</p></div></div>
+<table><thead><tr><th>Class</th><th>Students</th><th>Attendance</th><th>Benchmark</th><th>Status</th></tr></thead><tbody>
+{% for c in class_stats %}<tr><td><b>{{ c.name }}</b></td><td>{{ c.students }}</td><td>{{ c.rate }}%</td><td>85%</td><td><span class="status-dot {{ 'good' if c.rate >= 85 else ('watch' if c.rate >= 75 else 'risk') }}"></span>{{ 'Above benchmark' if c.rate >= 85 else ('Monitor' if c.rate >= 75 else 'Intervention') }}</td></tr>{% endfor %}
+</tbody></table></section>
+{% endblock %}

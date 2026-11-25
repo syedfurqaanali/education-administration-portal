@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ student.name }} · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="eyebrow">STUDENT PROFILE</div><h1>{{ student.name }}</h1><p class="muted">{{ student.classroom.name if student.classroom else 'Class not assigned' }} · Roll {{ student.roll_no }}</p></div>
+  <a class="secondary" href="{{ url_for('main.students') }}">← Back to students</a>
+</div>
+<div class="profile-head card">
+  <div class="profile-main"><span class="avatar huge">{{ student.name[:1] }}</span><div><h2>{{ student.name }}</h2><p>{{ student.email or 'No email' }}</p><p>Parent: {{ student.parent.name if student.parent else 'Not assigned' }}</p></div></div>
+  <div class="profile-stat"><span>30-Day Attendance</span><strong>{{ summary.rate }}%</strong><small>{{ summary.present }} present · {{ summary.absent }} absent · {{ summary.late }} late</small></div>
+</div>
+<section class="grid-main">
+  <div class="card"><div class="card-head"><div><h2>Attendance History</h2><p>Latest 20 records</p></div></div>
+  <table><thead><tr><th>Date</th><th>Status</th><th>Marked by</th></tr></thead><tbody>
+  {% for a in history %}<tr><td>{{ a.date.strftime('%d %b %Y') }}</td><td><span class="badge {{ a.status|lower }}">{{ a.status }}</span></td><td>{{ a.marker.name if a.marker else '-' }}</td></tr>{% endfor %}
+  </tbody></table></div>
+  <div class="card"><div class="card-head"><div><h2>Student Snapshot</h2><p>Current record</p></div></div>
+    <div class="snapshot"><div><span>Class</span><b>{{ student.classroom.name if student.classroom else '-' }}</b></div><div><span>Academic Year</span><b>{{ student.classroom.academic_year if student.classroom else '-' }}</b></div><div><span>Attendance Records</span><b>{{ summary.total }}</b></div><div><span>Attendance Health</span><b>{{ 'Healthy' if summary.rate >= 85 else ('Watch' if summary.rate >= 75 else 'At Risk') }}</b></div></div>
+  </div>
+</section>
+<section class="card"><div class="card-head"><div><h2>Feedback History</h2><p>Student-specific communication</p></div></div>
+{% for f in feedback %}<div class="list-row"><div><b>{{ f.category }}</b><small>{{ f.message }}</small></div><span class="badge">{{ f.status }}</span></div>{% else %}<p class="empty">No feedback recorded.</p>{% endfor %}
+</section>
+{% endblock %}

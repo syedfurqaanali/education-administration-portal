@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Parent Dashboard · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="eyebrow">PARENT PORTAL</div><h1>Welcome, {{ current_user.name }}</h1><p class="muted">Monitor your child's attendance, learning resources and school communication.</p></div>
+</div>
+<div class="kpis">
+  <div class="kpi"><div class="kpi-icon">CH</div><span>Children</span><strong>{{ children|length }}</strong><small>Linked students</small></div>
+  <div class="kpi"><div class="kpi-icon">AT</div><span>Attendance</span><strong>{{ summary.rate }}%</strong><small>Last 30 days</small></div>
+  <div class="kpi"><div class="kpi-icon">PR</div><span>Present</span><strong>{{ summary.present }}</strong><small>Attendance records</small></div>
+  <div class="kpi"><div class="kpi-icon warn">NT</div><span>Notifications</span><strong>{{ unread }}</strong><small>Unread messages</small></div>
+</div>
+
+<section class="grid-main">
+  <div class="card">
+    <div class="card-head"><div><h2>My Children</h2><p>Current student records</p></div></div>
+    {% for s in children %}
+    {% set a = namespace(rate=0) %}
+    <a class="child-card" href="{{ url_for('main.student_detail', student_id=s.id) }}">
+      <span class="avatar big">{{ s.name[:1] }}</span><span><b>{{ s.name }}</b><small>{{ s.classroom.name if s.classroom else 'Class not assigned' }} · Roll {{ s.roll_no }}</small></span>
+      <span class="arrow">→</span>
+    </a>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Attendance Trend</h2><p>Last 14 days</p></div></div>
+    <div class="bar-chart compact">
+      {% for x in trend %}<div class="bar-item"><div class="bar-track"><div class="bar-fill" style="height:{{ [x.rate, 5]|max }}%"></div></div><span>{{ x.date }}</span></div>{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="grid-main">
+  <div class="card">
+    <div class="card-head"><div><h2>Notifications</h2><p>School communication</p></div><a href="{{ url_for('main.notifications') }}">View all →</a></div>
+    {% for n in notifications %}<div class="notification-row {{ 'unread' if not n.is_read else '' }}"><span class="notif-icon {{ n.notification_type }}">{{ '!' if n.notification_type == 'warning' else 'i' }}</span><div><b>{{ n.title }}</b><p>{{ n.message }}</p><small>{{ n.created_at.strftime('%d %b %Y, %I:%M %p') }}</small></div></div>{% else %}<p class="empty">No notifications.</p>{% endfor %}
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>My Feedback</h2><p>Recent requests and concerns</p></div><a href="{{ url_for('main.feedback') }}">Submit →</a></div>
+    {% for f in recent_feedback %}<div class="list-row"><div><b>{{ f.category }}</b><small>{{ f.message }}</small></div><span class="badge">{{ f.status }}</span></div>{% else %}<p class="empty">No feedback submitted.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

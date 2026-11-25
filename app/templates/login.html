@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Login · EduAdmin{% endblock %}
+{% block content %}
+<div class="login-wrap"><div class="login-card">
+<div class="brand large">Edu<span>Admin</span><em>V2</em></div>
+<p class="muted">Education Administration & Analytics Portal</p>
+<form method="post"><label>Email</label><input name="email" type="email" placeholder="admin@school.local" required><label>Password</label><input name="password" type="password" placeholder="demo123" required><button class="primary full">Sign in</button></form>
+<div class="demo"><b>Demo accounts</b><div>Admin: admin@school.local</div><div>Teacher: teacher@school.local</div><div>Parent: parent@school.local</div><div>Parent 2: parent2@school.local</div><div>Password: demo123</div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Attendance · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow">OPERATIONS</div><h1>Attendance</h1><p class="muted">Record daily attendance and automatically alert parents about absences.</p></div></div>
+<section class="card">
+<form method="post">
+<div class="toolbar"><label>Date <input type="date" name="date" value="{{ selected_date }}"></label><div><span class="badge blue">Automation enabled</span> <button class="primary">Save Attendance</button></div></div>
+<table><thead><tr><th>Student</th><th>Roll No.</th><th>Class</th><th>Status</th></tr></thead>
+<tbody>{% for s in students %}{% set a=records.get(s.id) %}<tr><td><a class="student-link" href="{{ url_for('main.student_detail', student_id=s.id) }}"><span class="avatar">{{ s.name[:1] }}</span>{{ s.name }}</a></td><td>{{ s.roll_no }}</td><td>{{ s.classroom.name if s.classroom else '-' }}</td><td><select name="status_{{ s.id }}"><option {% if a and a.status=='Present' %}selected{% endif %}>Present</option><option {% if a and a.status=='Absent' %}selected{% endif %}>Absent</option><option {% if a and a.status=='Late' %}selected{% endif %}>Late</option></select></td></tr>{% endfor %}</tbody></table>
+</form>
+</section>
+{% endblock %}

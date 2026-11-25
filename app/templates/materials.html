@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Materials · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow">LEARNING</div><h1>Study Materials</h1><p class="muted">Centralized learning resources for students, teachers and parents.</p></div></div>
+{% if current_user.role in ['admin','teacher'] %}
+<section class="card form-card"><div class="card-head"><h2>Publish Material</h2><span class="muted">Add a resource to the library</span></div>
+<form method="post" class="form-grid"><input name="title" placeholder="Material title" required><input name="subject" placeholder="Subject"><input name="file_name" placeholder="File name / URL"><input name="description" placeholder="Short description"><button class="primary">Publish Material</button></form>
+</section>{% endif %}
+<section class="card"><div class="card-head"><div><h2>Resource Library</h2><p>Latest published learning resources</p></div></div>
+{% for m in materials %}<div class="material"><div class="material-icon">DOC</div><div><b>{{ m.title }}</b><small>{{ m.subject or 'General' }} · Uploaded {{ m.created_at.strftime('%d %b %Y') }}</small><p>{{ m.description }}</p></div><span class="badge">{{ m.file_name }}</span></div>{% else %}<p class="empty">No resources available.</p>{% endfor %}
+</section>
+{% endblock %}

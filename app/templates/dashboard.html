@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="eyebrow">ADMINISTRATION</div><h1>Operations Dashboard</h1><p class="muted">A single view of students, attendance, engagement and operational activity.</p></div>
+  <div class="head-actions"><a class="secondary" href="{{ url_for('main.attendance_csv') }}">Export Attendance CSV</a></div>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="kpi-icon">ST</div><span>Students</span><strong>{{ students }}</strong><small>Active records</small></div>
+  <div class="kpi"><div class="kpi-icon">TC</div><span>Teachers</span><strong>{{ teachers }}</strong><small>Teaching staff</small></div>
+  <div class="kpi"><div class="kpi-icon">AT</div><span>30-Day Attendance</span><strong>{{ summary.rate }}%</strong><small>{{ summary.present }} present records</small></div>
+  <div class="kpi"><div class="kpi-icon warn">AL</div><span>At-Risk Students</span><strong>{{ low|length }}</strong><small>Below 75% attendance</small></div>
+</div>
+
+<section class="grid-main">
+  <div class="card chart-card">
+    <div class="card-head"><div><h2>Attendance Trend</h2><p>Last 14 days</p></div><span class="badge blue">{{ today.rate }}% today</span></div>
+    <div class="bar-chart">
+      {% for x in trend %}
+      <div class="bar-item"><div class="bar-track"><div class="bar-fill" style="height:{{ [x.rate, 5]|max }}%"></div></div><span>{{ x.date }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Attendance Health</h2><p>Current monitoring window</p></div></div>
+    <div class="donut-row">
+      <div class="donut" style="--p:{{ summary.rate }}"><span>{{ summary.rate }}%</span></div>
+      <div><b>Healthy attendance</b><p class="muted">Present + late records across the last 30 days.</p><div class="mini-stat"><span>Present</span><b>{{ summary.present }}</b></div><div class="mini-stat"><span>Absent</span><b>{{ summary.absent }}</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="grid-main">
+  <div class="card">
+    <div class="card-head"><div><h2>Class Performance</h2><p>30-day attendance by class</p></div><a href="{{ url_for('main.analytics') }}">Detailed analytics →</a></div>
+    <table><thead><tr><th>Class</th><th>Students</th><th>Attendance</th><th>Health</th></tr></thead>
+    <tbody>{% for c in class_stats %}<tr><td><b>{{ c.name }}</b></td><td>{{ c.students }}</td><td>{{ c.rate }}%</td><td><span class="status-dot {{ 'good' if c.rate >= 85 else ('watch' if c.rate >= 75 else 'risk') }}"></span>{{ 'Good' if c.rate >= 85 else ('Watch' if c.rate >= 75 else 'At Risk') }}</td></tr>{% endfor %}</tbody></table>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Attention Required</h2><p>Students below 75%</p></div><span class="badge red">{{ low|length }}</span></div>
+    {% for s, a in low[:5] %}
+      <a class="attention-row" href="{{ url_for('main.student_detail', student_id=s.id) }}"><span class="avatar">{{ s.name[:1] }}</span><span><b>{{ s.name }}</b><small>{{ s.classroom.name if s.classroom else 'Unassigned' }}</small></span><strong>{{ a.rate }}%</strong></a>
+    {% else %}<p class="empty">No students currently below the monitoring threshold.</p>{% endfor %}
+  </div>
+</section>
+
+<section class="grid-main">
+  <div class="card">
+    <div class="card-head"><div><h2>Recent Activity</h2><p>Latest platform actions</p></div></div>
+    {% for a in activities %}<div class="activity"><span class="activity-dot"></span><div><b>{{ a.action }}</b><small>{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</small></div></div>{% endfor %}
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h2>Recent Materials</h2><p>Latest learning resources</p></div><a href="{{ url_for('main.materials') }}">View all →</a></div>
+    {% for m in materials %}<div class="list-row"><div><b>{{ m.title }}</b><small>{{ m.subject }} · {{ m.created_at.strftime('%d %b') }}</small></div><span class="badge">{{ m.file_name }}</span></div>{% endfor %}
+  </div>
+</section>
+{% endblock %}

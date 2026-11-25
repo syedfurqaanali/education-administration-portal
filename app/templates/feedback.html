@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Feedback · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow">ENGAGEMENT</div><h1>Feedback & Escalations</h1><p class="muted">Capture concerns, suggestions and academic feedback.</p></div></div>
+<section class="card form-card">
+<h2>Submit Feedback</h2>
+<form method="post" class="form-grid">
+<select name="student_id" required><option value="">Select student</option>{% for s in students %}<option value="{{ s.id }}">{{ s.name }} — {{ s.roll_no }}</option>{% endfor %}</select>
+<select name="category"><option>Academic</option><option>Attendance</option><option>Administration</option><option>Technical</option><option>Other</option></select>
+<textarea name="message" placeholder="Describe the feedback or issue..." required></textarea>
+<button class="primary">Submit</button>
+</form>
+</section>
+<section class="card"><div class="card-head"><div><h2>Feedback Log</h2><p>Track open and closed items</p></div></div>
+<table><thead><tr><th>Date</th><th>Student</th><th>Category</th><th>Message</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>{% for f in feedback_items %}<tr><td>{{ f.created_at.strftime('%d %b %Y') }}</td><td>{{ f.student.name }}</td><td>{{ f.category }}</td><td>{{ f.message }}</td><td><span class="badge">{{ f.status }}</span></td><td>{% if current_user.role in ['admin','teacher'] and f.status == 'Open' %}<form method="post" action="{{ url_for('main.close_feedback', feedback_id=f.id) }}"><button class="link-button">Close</button></form>{% else %}-{% endif %}</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Notifications · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow">COMMUNICATION</div><h1>Notifications</h1><p class="muted">Alerts, reminders and platform messages.</p></div></div>
+<section class="card">
+{% for n in notifications %}
+<div class="notification-row {{ 'unread' if not n.is_read else '' }}">
+<span class="notif-icon {{ n.notification_type }}">{{ '!' if n.notification_type == 'warning' else 'i' }}</span>
+<div><b>{{ n.title }}</b><p>{{ n.message }}</p><small>{{ n.created_at.strftime('%d %b %Y, %I:%M %p') }}</small></div>
+{% if not n.is_read %}<form method="post" action="{{ url_for('main.mark_notification_read', notification_id=n.id) }}"><button class="secondary">Mark read</button></form>{% endif %}
+</div>
+{% else %}<p class="empty">No notifications.</p>{% endfor %}
+</section>
+{% endblock %}

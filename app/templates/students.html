@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Students · EduAdmin{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow">PEOPLE</div><h1>Student Directory</h1><p class="muted">Search, filter and review student records.</p></div></div>
+<section class="card form-card">
+<div class="card-head"><h2>Add Student</h2><span class="muted">Create a new student record</span></div>
+<form method="post" class="form-grid">
+<input name="name" placeholder="Student name" required><input name="roll_no" placeholder="Roll number" required>
+<input name="email" type="email" placeholder="Email">
+<select name="class_id"><option value="">Select class</option>{% for c in classes %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select>
+<select name="parent_id"><option value="">Assign parent</option>{% for p in parents %}<option value="{{ p.id }}">{{ p.name }} — {{ p.email }}</option>{% endfor %}</select>
+<button class="primary">Add Student</button>
+</form>
+</section>
+<section class="card">
+<div class="filterbar">
+<form method="get" class="searchbar"><input name="q" value="{{ search }}" placeholder="Search name, roll number or email"><select name="class_id"><option value="">All classes</option>{% for c in classes %}<option value="{{ c.id }}" {% if selected_class == c.id|string %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select><button class="secondary">Filter</button></form>
+<span class="muted">{{ students|length }} records</span>
+</div>
+<table><thead><tr><th>Student</th><th>Roll No.</th><th>Class</th><th>Parent</th><th>Attendance</th><th></th></tr></thead>
+<tbody>{% for s in students %}
+{% set ns = namespace(total=0,present=0) %}
+{% for a in s.__dict__.get('attendance', []) %}{% endfor %}
+<tr><td><span class="avatar">{{ s.name[:1] }}</span><b>{{ s.name }}</b></td><td>{{ s.roll_no }}</td><td>{{ s.classroom.name if s.classroom else '-' }}</td><td>{{ s.parent.name if s.parent else '-' }}</td><td><a class="link" href="{{ url_for('main.student_detail', student_id=s.id) }}">View analytics</a></td><td><a class="link" href="{{ url_for('main.student_detail', student_id=s.id) }}">Open →</a></td></tr>
+{% endfor %}</tbody></table>
+</section>
+{% endblock %}
